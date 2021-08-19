@@ -19,6 +19,14 @@ gpgkeyname="lenevo backup"
 # enable checking pckglist [yes/no]
 enablepckglistcheck="yes"  # Arch + Pacmnan only for now
 
+# check if bcktousb folder exist under .config
+if [ ! -f $ignorefile ] && [ ! -f $trackfile ] ; then
+    echo "Initializing config files, script ran for first time";
+    mkdir "$HOME/.config/bcktousb"
+    touch $ignorefile;
+    touch $trackfile;
+fi
+
 # check if a backup already has been made today
 if [ -f $signedbckupfile ] ; then
     echo "backup from today already present under current folder 
@@ -26,14 +34,9 @@ please remove it first";
     exit -1;
 fi
 
-# check if necessary .config files are not created
-if [ ! -f $ignorefile ]; then 
-    echo "exclude list not created";
-    exit -2;
-fi 
 # check if tracklist are not created
-if [ ! -f $trackfile ]; then
-    echo "track list not created";
+if [ ! -s $trackfile ]; then
+    echo "tracklist is empty under: $trackfile";
     exit -2;
 fi
 
@@ -54,14 +57,21 @@ mkdir $tmpbckup
 # reading list of files/folders to take backup of from trackfile
 readarray -td' ' tracklocs < <(cat $trackfile | tr '\n' ' ' | tr -s [:space:] ' ')
 # merging two for final backup locations
-bcklocs=( "${tracklocs[@]}" "${pckglist[@]}")
+rawbcklocs=( "${tracklocs[@]}" "${pckglist[@]}")
+
+bcklocs=$(eval echo ${rawbcklocs[@]})
 
 echo "The locations marked for backing are: ${bcklocs[*]}"
 
 for i in ${bcklocs[@]};
 do 
     echo "bcking up $i";
-    rsync -r --relative --info=progress2 --exclude-from $ignorefile $i $tmpbckup; # rsync's all the bcklocs to /tmp/bckup
+    if [ -s $ignorefile ]; then
+        rsync -r --relative --info=progress2 --exclude-from $ignorefile $i $tmpbckup; # rsync's all the bcklocs to /tmp/bckup
+    else
+        rsync -r --relative --info=progress2 $i $tmpbckup; # rsync's all the bcklocs to /tmp/bckup
+    fi
+
 done
 
 echo "creating archive"
@@ -69,9 +79,8 @@ tar czf $bckupfile --directory=$tmpbckup . ; # tars and gzip the entire /tmp/bck
 
 
 echo "signing the backup file"
-gpg -s -b -u "$gpgkeyname" $bckupfile || echo "gpg error, make sure gpgkeyname
-in line 17 of script is set correctly" ; exit 1 # sign the backup generated , exits if failed
-
+gpg -s -b -u "$gpgkeyname" $bckupfile || echo "gpg error, make sure gpgkeyname in line 17 of script 
+is set correctly" ; exit 1 # sign the backup generated , exits if failed
 
 echo "creating backup package"
 # tar the signature and the gzip file together
