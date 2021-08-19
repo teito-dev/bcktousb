@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# change these values as per needed
+
+# where files are stored while backup is being generated
+tmpbckup="/tmp/bckup" 
+# the backup tar.gz file name
+bckupfile="bckup-laptop-$(date -I).tar.gz" 
+# the signed gzip of the file with .sig inside 
+signedbckupfile="signed-$bckupfile" 
+# the name of the detached .sig
+bckupfilesig="$bckupfile.sig" 
+# path of exclude list , refer to rsync --exclude-from for format
+ignorefile="$HOME/.config/bcktousb/excludelist" 
+# path of track list for list of files and folders to store in backup, format same as .gitignore
+trackfile="$HOME/.config/bcktousb/tracklist"
+# key name to sign it with
+gpgkeyname="lenevo backup" 
+# enable checking pckglist [yes/no]
+enablepckglistcheck="yes"  # Arch + Pacmnan only for now
+
+# check if a backup already has been made today
+if [ -f $signedbckupfile ] ; then
+    echo "backup from today already present under current folder 
+please remove it first";
+    exit -1;
+fi
+
+# check if necessary .config files are not created
+if [ ! -f $ignorefile ]; then 
+    echo "exclude list not created";
+    exit -2;
+fi 
+# check if tracklist are not created
+if [ ! -f $trackfile ]; then
+    echo "track list not created";
+    exit -2;
+fi
+
+# alert user to update the list of /etc/ folders using
+# bckutil etc , if file is different from bckutil output
+if [ $enablepckglistcheck == "yes" ]; then
+    echo "Calculating list of modified /etc files to backup";
+    readarray -td' ' pckglist < <(pacman -Qii | awk '/^MODIFIED/ {print $2}' | tr '\n' ' ');
+fi
+
+# delete /tmp/backup if present
+if [ -d $tmpbckup ] ; then
+    rm -rf $tmpbckup;
+fi
+
+mkdir $tmpbckup
+
+# reading list of files/folders to take backup of from trackfile
+readarray -td' ' tracklocs < <(cat $trackfile | tr '\n' ' ' | tr -s [:space:] ' ')
+# merging two for final backup locations
+bcklocs=( "${tracklocs[@]}" "${pckglist[@]}")
+
+echo "The locations marked for backing are: ${bcklocs[*]}"
+
+for i in ${bcklocs[@]};
+do 
+    echo "bcking up $i";
+    rsync -r --relative --info=progress2 --exclude-from $ignorefile $i $tmpbckup; # rsync's all the bcklocs to /tmp/bckup
+done
+
+echo "creating archive"
+tar czf $bckupfile --directory=$tmpbckup . ; # tars and gzip the entire /tmp/bckup folder
+
+
+echo "signing the backup file"
+gpg -s -b -u "$gpgkeyname" $bckupfile || echo "gpg error, make sure gpgkeyname
+in line 17 of script is set correctly" ; exit 1 # sign the backup generated , exits if failed
+
+
+echo "creating backup package"
+# tar the signature and the gzip file together
+tar cf $signedbckupfile $bckupfile $bckupfilesig  
+
+
+echo "cleaning all temp files"
+# clean all files except the bckup
+rm -rf $tmpbckup
+rm $bckupfile
+rm $bckupfilesig
+
+# ending message
+echo -e "\nBackup Generated , please rcp it over to safe location"
