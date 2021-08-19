@@ -17,7 +17,7 @@ trackfile="$HOME/.config/bcktousb/tracklist"
 # key name to sign it with
 gpgkeyname="lenevo backup" 
 # enable checking pckglist [yes/no]
-enablepckglistcheck="yes"  # Arch + Pacmnan only for now
+enablepckglistcheck="no"  # Arch + Pacmnan only for now
 
 # check if bcktousb folder exist under .config
 if [ ! -f $ignorefile ] && [ ! -f $trackfile ] ; then
