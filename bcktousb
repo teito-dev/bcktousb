@@ -5,7 +5,7 @@
 # where files are stored while backup is being generated
 tmpbckup="/tmp/bckup" 
 # the backup tar.gz file name
-bckupfile="bckup-laptop-$(date -I).tar.gz" 
+bckupfile="bckup-laptop-$(date +%Y-%m-%d_%H.%M.%S_TZ%z).tar.gz" 
 # the signed gzip of the file with .sig inside 
 signedbckupfile="signed-$bckupfile" 
 # the name of the detached .sig
