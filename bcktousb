@@ -40,8 +40,6 @@ if [ ! -s $trackfile ]; then
     exit -2;
 fi
 
-# alert user to update the list of /etc/ folders using
-# bckutil etc , if file is different from bckutil output
 if [ $enableEtclistcheck == "yes" ]; then
     echo "Calculating list of modified /etc files to backup";
     readarray -td' ' pckglist < <(pacman -Qii | awk '/^MODIFIED/ {print $2}' | tr '\n' ' ');
