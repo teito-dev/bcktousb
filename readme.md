@@ -30,3 +30,5 @@ Todo:
 - [ ] Allow an option to directly send the backup
      to specific backends
 - [ ] Support incremental backups
+- [ ] Support seamless restoration
+- [ ] Make backup script cleaner to tweak , using functions
