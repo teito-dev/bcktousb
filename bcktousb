@@ -24,7 +24,7 @@ file_a_bug_request="please file a bug at https://github.com/teito-dev/bcktousb"
 
 function main 
 {
-
+parseParams "$@" || report_a_bug 3
 makeChecks || report_a_bug 1 # does checking before proceed, and aborts if needed
 clean_temp_folder || {
     echo "couldnt clean temp folder";exit -2
@@ -171,6 +171,36 @@ rm $bckupfilesig
 
 # -----
 
+function parseParams
+{
+    if [[ $1 == "clean" ]];then
+        echo "Cleaning tmp directory"
+        if [ -d $tmpbckup ] ; then
+            rm -rf $tmpbckup || {
+                echo "error deleting directory"; exit -202
+            }
+            echo "cleaned";
+            exit 0;
+        else
+            echo "ERROR: temp directory does not exist";
+            exit -203;
+        return 204;
+        fi
+    elif [[ $1 == "-h" ]];then
+        echo "bcktousb version 0.2 
+
+bcktousb is a backup script to simplify taking backups
+
+commands:
+clean: cleans the temp directory
+-h: shows these messages
+No params passed: just takes backups"
+        exit 0;
+    fi
+}
+
+# -----
+
 function report_a_bug
 {
 
@@ -179,6 +209,9 @@ if [ $1 -eq 1 ]; then
 $file_a_bug_request"
 elif [ $1 -eq 2]; then
     echo "ERROR: failed while generating list of files to backup
+$file_a_bug_request"
+elif [ $1 -eq 3]; then
+    echo "ERROR: failed while cleaning , this should not happen
 $file_a_bug_request"
 fi
 
