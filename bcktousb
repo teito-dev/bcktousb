@@ -19,6 +19,41 @@ gpgkeyname="lenevo backup"
 # enable checking pckglist [yes/no]
 enableEtclistcheck="yes"  # Arch + Pacmnan only for now
 
+# some internal global params below
+file_a_bug_request="please file a bug at https://github.com/teito-dev/bcktousb"
+
+function main 
+{
+
+makeChecks || report_a_bug 1 # does checking before proceed, and aborts if needed
+clean_temp_folder || {
+    echo "couldnt clean temp folder";exit -2
+} # clean temp folder
+generate_bcklocks_list || report_a_bug 2 # fills bcklocks array with files/folders to track
+echo "The locations marked for backing are: ${bcklocs[*]}"
+store_files_in_tmp || {
+    echo "error with storing files under tmp";exit -3
+} # creates a folder under /tmp directory to store data
+generate_archive || {
+    echo "error while generating archive , if you feel its a bug
+$file_a_bug_request";exit -4
+} # generates archive with all the data under /tmp
+clean_all_files || {
+    echo "error while cleaning all files, if you feel its a bug
+$file_a_bug_request";exit -5
+} # cleans /tmp folder for bckup and other files
+
+# ending message
+echo -e "\nBackup Generated , please rcp it over to safe location"
+}
+
+
+# ---------         SCRIPT ENDED            -----------
+# --------- ONLY INTERNAL FUNCTION DEFINITIONS BELOW -----------
+
+function makeChecks
+{
+
 # check if bcktousb folder exist under .config
 if [ ! -f $ignorefile ] && [ ! -f $trackfile ] ; then
     echo "Initializing config files, script ran for first time";
@@ -40,27 +75,57 @@ if [ ! -s $trackfile ]; then
     exit -2;
 fi
 
-if [ $enableEtclistcheck == "yes" ]; then
-    echo "Calculating list of modified /etc files to backup";
-    readarray -td' ' pckglist < <(pacman -Qii | awk '/^MODIFIED/ {print $2}' | tr '\n' ' ');
-fi
+# check dependencies
+dependence_list=(
+    gpg
+    which
+    tar
+    rsync
+    )
 
-# delete /tmp/backup if present
+for x in ${dependence_list[@]};
+do 
+    is_installed=$(which $x)
+    if  [ ! $? -eq 0 ];then
+        echo "Error: $x not installed";
+    fi
+done
+
+}
+
+function clean_temp_folder
+{
+# --- delete /tmp/backup if present and then create it
 if [ -d $tmpbckup ] ; then
     rm -rf $tmpbckup;
 fi
 
 mkdir $tmpbckup
+}
+
+# ------
+
+function generate_bcklocks_list
+{
+# Calculating list of /etc files modified from stock
+if [ $enableEtclistcheck == "yes" ]; then
+    echo "Calculating list of modified /etc files to backup";
+    readarray -td' ' pckglist < <(pacman -Qii | awk '/^MODIFIED/ {print $2}' | tr '\n' ' ');
+fi
 
 # reading list of files/folders to take backup of from trackfile
 readarray -td' ' tracklocs < <(cat $trackfile | tr '\n' ' ' | tr -s [:space:] ' ')
+
 # merging two for final backup locations
 rawbcklocs=( "${tracklocs[@]}" "${pckglist[@]}")
 
 bcklocs=$(eval echo ${rawbcklocs[@]})
+}
 
-echo "The locations marked for backing are: ${bcklocs[*]}"
+# ------
 
+function store_files_in_tmp
+{
 for i in ${bcklocs[@]};
 do 
     echo "bcking up $i";
@@ -71,25 +136,57 @@ do
     fi
 
 done
+}
 
+
+# -----
+
+function generate_archive
+{
 echo "creating archive"
 tar czf $bckupfile --directory=$tmpbckup . ; # tars and gzip the entire /tmp/bckup folder
 
 
 echo "signing the backup file"
-gpg -s -b -u "$gpgkeyname" $bckupfile || echo "gpg error, make sure gpgkeyname in line 17 of script 
-is set correctly" ; exit 1 # sign the backup generated , exits if failed
+gpg -s -b -u "$gpgkeyname" $bckupfile || { 
+    echo "gpg error, make sure gpgkeyname in config or params 
+is set correctly" ; exit -42 
+} # sign the backup generated , exits if failed
 
 echo "creating backup package"
 # tar the signature and the gzip file together
 tar cf $signedbckupfile $bckupfile $bckupfilesig  
+}
 
+# -----
 
+function clean_all_files
+{
 echo "cleaning all temp files"
 # clean all files except the bckup
 rm -rf $tmpbckup
 rm $bckupfile
 rm $bckupfilesig
+}
 
-# ending message
-echo -e "\nBackup Generated , please rcp it over to safe location"
+# -----
+
+function report_a_bug
+{
+
+if [ $1 -eq 1 ]; then
+    echo "ERROR: checks failed ! 
+$file_a_bug_request"
+elif [ $1 -eq 2]; then
+    echo "ERROR: failed while generating list of files to backup
+$file_a_bug_request"
+fi
+
+exit -401; # exited after reporting a bug
+}
+
+# Execute main function
+main "$@";exit 
+# Do not remove exit , its used to ensure 
+# nothing after this is parsed
+
