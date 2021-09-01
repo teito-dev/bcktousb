@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 tmpInstallDir="/tmp/bcktousbsrc"
-repoLocation="https://raw.githubusercontent.com/teito-dev/bcktousb/master"
+repoLocation="https://raw.githubusercontent.com/teito-dev/bcktousb/releases"
 shareDir="/usr/local/share/bcktousb"
 binDir="/usr/local/bin"
 bcktousbBin="$binDir/bcktousb"
