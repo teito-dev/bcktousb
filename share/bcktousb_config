@@ -1,0 +1,20 @@
+# path of config directory
+configdir="$HOME/.config"
+# where files are stored while backup is being generated
+tmpbckup="/tmp/bckup" 
+# the backup tar.gz file name
+bckupfile="bckup-laptop-$(date +%Y-%m-%d_%H.%M.%S_TZ%z).tar.gz" 
+# the signed gzip of the file with .sig inside 
+signedbckupfile="signed-$bckupfile" 
+# the name of the detached .sig
+bckupfilesig="$bckupfile.sig" 
+# path of config file
+configfile="$configdir/bcktousb/bcktousb_config"
+# path of exclude list , refer to rsync --exclude-from for format
+ignorefile="$configdir/bcktousb/excludelist" 
+# path of track list for list of files and folders to store in backup, format same as .gitignore
+trackfile="$configdir/bcktousb/tracklist"
+# key name to sign it with
+gpgkeyname="defaultkey" 
+# enable checking pckglist [yes/no]
+enableEtclistcheck="no"  # Arch + Pacmnan only for now
