@@ -12,6 +12,8 @@ bckupfile="bckup-laptop-$(date +%Y-%m-%d_%H.%M.%S_TZ%z).tar.gz"
 signedbckupfile="signed-$bckupfile" 
 # the name of the detached .sig
 bckupfilesig="$bckupfile.sig" 
+# path of config file
+configfile="$configdir/bcktousb/bcktousb_config"
 # path of exclude list , refer to rsync --exclude-from for format
 ignorefile="$configdir/bcktousb/excludelist" 
 # path of track list for list of files and folders to store in backup, format same as .gitignore
@@ -95,6 +97,25 @@ do
 done
 
 }
+
+# ------
+
+function init_config
+{
+# --- generate config folder if doesnt exist
+if [ ! -d "$configdir/bcktousb" ] ; then
+    mkdir "$configdir/bcktousb"
+fi
+# -- generate config conf file with default values
+if [ ! -f $configfile ];then
+    cp /usr/local/share/bcktousb/bcktousb_config $configfile
+fi
+# --- generate tracklist and ignore list
+touch $ignorefile;
+touch $trackfile;
+}
+
+# ------
 
 function clean_temp_folder
 {
