@@ -29,7 +29,9 @@ file_a_bug_request="please file a bug at https://github.com/teito-dev/bcktousb"
 
 function main 
 {
-parseParams "$@" || report_a_bug 3
+
+sourceConfigVals || report_a_bug 97 # Imports config values from .config
+parseParams "$@" || report_a_bug 3  # checks params passed and acts on it
 makeChecks || report_a_bug 1 # does checking before proceed, and aborts if needed
 clean_temp_folder || {
     echo "couldnt clean temp folder";exit -2
@@ -189,6 +191,16 @@ echo "cleaning all temp files"
 rm -rf $tmpbckup
 rm $bckupfile
 rm $bckupfilesig
+}
+
+# -----
+
+function sourceConfigVals
+{
+    source $configfile || {
+        echo "config file doesnt exist: installing now"
+        init_config && source $configfile
+    }
 }
 
 # -----
