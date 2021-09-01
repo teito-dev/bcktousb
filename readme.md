@@ -16,10 +16,11 @@ Dependencies:
 - tar
 
 How to use:
-- Copy the bcktousb script to /usr/local/bin
-- Make sure its executable by chmod +x backtousb
-- Open a new terminal
-- Run the bcktousb script once for the first time by typing "bcktousb" in the terminal
+- To install type this line in commandline
+```bash
+    curl https://raw.githubusercontent.com/teito-dev/bcktousb/releases/install.sh | bash
+```
+
 - To edit the list of files to backup open file under .config/bcktousb by name of tracklist , which stores the list of all files and folders that need to be stored inside the backup
 
 Todo:
