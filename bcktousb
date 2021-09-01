@@ -62,9 +62,7 @@ function makeChecks
 # check if bcktousb folder exist under .config
 if [ ! -f $ignorefile ] && [ ! -f $trackfile ] ; then
     echo "Initializing config files, script ran for first time";
-    mkdir "$HOME/.config/bcktousb"
-    touch $ignorefile;
-    touch $trackfile;
+    init_config || report_a_bug 29
 fi
 
 # check if a backup already has been made today
