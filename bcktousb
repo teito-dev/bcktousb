@@ -2,6 +2,8 @@
 
 # change these values as per needed
 
+# path of config directory
+configdir="$HOME/.config"
 # where files are stored while backup is being generated
 tmpbckup="/tmp/bckup" 
 # the backup tar.gz file name
@@ -11,9 +13,9 @@ signedbckupfile="signed-$bckupfile"
 # the name of the detached .sig
 bckupfilesig="$bckupfile.sig" 
 # path of exclude list , refer to rsync --exclude-from for format
-ignorefile="$HOME/.config/bcktousb/excludelist" 
+ignorefile="$configdir/bcktousb/excludelist" 
 # path of track list for list of files and folders to store in backup, format same as .gitignore
-trackfile="$HOME/.config/bcktousb/tracklist"
+trackfile="$configdir/bcktousb/tracklist"
 # key name to sign it with
 gpgkeyname="defaultkey" 
 # enable checking pckglist [yes/no]
