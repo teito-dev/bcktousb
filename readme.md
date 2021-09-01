@@ -23,12 +23,12 @@ How to use:
 - To edit the list of files to backup open file under .config/bcktousb by name of tracklist , which stores the list of all files and folders that need to be stored inside the backup
 
 Todo:
-- [ ] Write an install script to 
+- [x] Write an install script to 
       make it easier to setup
-- [ ] Make it easier to use
+- [x] Make it easier to use
 - [ ] Allow an option to encrypt backups
 - [ ] Allow an option to directly send the backup
      to specific backends
 - [ ] Support incremental backups
 - [ ] Support seamless restoration
-- [ ] Make backup script cleaner to tweak , using functions
+- [x] Make backup script cleaner to tweak , using functions
