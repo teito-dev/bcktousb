@@ -15,9 +15,10 @@ ignorefile="$HOME/.config/bcktousb/excludelist"
 # path of track list for list of files and folders to store in backup, format same as .gitignore
 trackfile="$HOME/.config/bcktousb/tracklist"
 # key name to sign it with
-gpgkeyname="lenevo backup" 
+gpgkeyname="defaultkey" 
 # enable checking pckglist [yes/no]
-enableEtclistcheck="yes"  # Arch + Pacmnan only for now
+enableEtclistcheck="no"  # Arch + Pacmnan only for now
+
 
 # some internal global params below
 file_a_bug_request="please file a bug at https://github.com/teito-dev/bcktousb"
