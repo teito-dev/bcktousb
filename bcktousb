@@ -4,6 +4,8 @@
 
 # path of config directory
 configdir="$HOME/.config"
+# path of bcktousb config directory
+bcktousbconfigdir="$configdir/bcktousb"
 # where files are stored while backup is being generated
 tmpbckup="/tmp/bckup" 
 # the backup tar.gz file name
@@ -13,11 +15,11 @@ signedbckupfile="signed-$bckupfile"
 # the name of the detached .sig
 bckupfilesig="$bckupfile.sig" 
 # path of config file
-configfile="$configdir/bcktousb/bcktousb_config"
+configfile="$bcktousbconfigdir/bcktousb_config"
 # path of exclude list , refer to rsync --exclude-from for format
-ignorefile="$configdir/bcktousb/excludelist" 
+ignorefile="$bcktousbconfigdir/excludelist" 
 # path of track list for list of files and folders to store in backup, format same as .gitignore
-trackfile="$configdir/bcktousb/tracklist"
+trackfile="$bcktousbconfigdir/tracklist"
 # key name to sign it with
 gpgkeyname="defaultkey" 
 # enable checking pckglist [yes/no]
@@ -111,8 +113,8 @@ done
 function init_config
 {
 # --- generate config folder if doesnt exist
-if [ ! -d "$configdir/bcktousb" ] ; then
-    mkdir "$configdir/bcktousb"
+if [ ! -d "$bcktousbconfigdir" ] ; then
+    mkdir "$bcktousbconfigdir"
 fi
 # -- generate config conf file with default values
 if [ ! -f $configfile ];then
