@@ -31,8 +31,9 @@ function main
 {
 
 sourceConfigVals || report_a_bug 97 # Imports config values from .config
+initmakeChecks || report_a_bug 1 # checks if config files are present, if not installs them
 parseParams "$@" || report_a_bug 3  # checks params passed and acts on it
-makeChecks || report_a_bug 1 # does checking before proceed, and aborts if needed
+preBackupmakeChecks || report_a_bug 1 # does checking before proceed, and aborts if needed
 clean_temp_folder || {
     echo "couldnt clean temp folder";exit -2
 } # clean temp folder
@@ -58,14 +59,21 @@ echo -e "\nBackup Generated , please rcp it over to safe location"
 # ---------         SCRIPT ENDED            -----------
 # --------- ONLY INTERNAL FUNCTION DEFINITIONS BELOW -----------
 
-function makeChecks
-{
 
+function initmakeChecks
+{
 # check if bcktousb folder exist under .config
 if [ ! -f $ignorefile ] && [ ! -f $trackfile ] ; then
     echo "Initializing config files, script ran for first time";
     init_config || report_a_bug 29
 fi
+
+}
+
+# ------
+
+function preBackupmakeChecks
+{
 
 # check if a backup already has been made today
 if [ -f $signedbckupfile ] ; then
