@@ -229,7 +229,7 @@ function parseParams
         return 204;
         fi
     elif [[ $1 == "-h" ]];then
-        echo "bcktousb version 0.2 
+        echo "bcktousb version 0.3 
 
 bcktousb is a backup script to simplify taking backups
 
