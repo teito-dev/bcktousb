@@ -2,8 +2,8 @@
 
 tmpInstallDir="/tmp/bcktousbsrc"
 repoLocation="https://raw.githubusercontent.com/teito-dev/bcktousb/releases"
-shareDir="/usr/local/share/bcktousb"
-binDir="/usr/local/bin"
+shareDir="$HOME/.local/share/bcktousb"
+binDir="$HOME/.local/bin"
 bcktousbBin="$binDir/bcktousb"
 
 echo "Downloading all necessary install files"
@@ -21,18 +21,13 @@ curl -O "$repoLocation/share/bcktousb_config" # download the default config file
 # Start installing 
 echo -e "\n\n"
 echo -e "All files downloaded, Starting Installation Now \n"
-echo -e "note: to install root access is needed \n"
-sudo cp $tmpInstallDir/bcktousb $bcktousbBin
-
-echo "Installing the tool as current user: $USER"
-# chown bcktousb to $USER
-sudo chown $USER:$USER $bcktousbBin
-chmod +x $bcktousbBin
+# Install main script
+cp $tmpInstallDir/bcktousb $bcktousbBin
+chmod +x $bcktousbBin # make it executable
 
 # Init the shareDir with all necessary content
-sudo mkdir $shareDir
-sudo cp "$tmpInstallDir/bcktousb_config" "$shareDir/bcktousb_config"
-
+mkdir $shareDir
+cp "$tmpInstallDir/bcktousb_config" "$shareDir/bcktousb_config"
 # cleaning up after installation
 echo "Cleaning up post install"
 rm -r $tmpInstallDir
